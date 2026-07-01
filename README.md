@@ -1,8 +1,8 @@
 # Piped Template Engine
 
-**Piped Template Engine**, or simply **Piped Template**, is a lightweight Java template engine that uses pipe-based syntax for server-side HTML rendering.
+**Piped Template Engine**, or simply **Piped**, is a lightweight Java template engine that uses pipe-based syntax for server-side HTML rendering.
 
-The goal of PTE is to provide a simple, readable, safe-by-default, and HTMX-friendly template engine for Java MVC applications.
+The goal of Piped is to provide a simple, readable, safe-by-default, and HTMX-friendly template engine for Java MVC applications.
 
 ```html
 <h1>|title|</h1>
@@ -30,7 +30,7 @@ Feature 7: Optional chaining and fallback
 
 Most Java template engines are powerful, but some can feel verbose for small MVC and HTMX-style applications.
 
-PTE is designed to be:
+Piped is designed to be:
 
 ```txt
 Simple
@@ -154,7 +154,7 @@ class="|attr className|"
 |/if|
 ```
 
-PTE uses readable word-based boolean operators instead of symbolic JavaScript-style operators.
+Piped uses readable word-based boolean operators instead of symbolic JavaScript-style operators.
 
 Recommended:
 
@@ -178,7 +178,7 @@ Recommended:
 
 ## Boolean Operators
 
-PTE supports these word-based boolean operators:
+Piped supports these word-based boolean operators:
 
 ```txt
 not
@@ -260,7 +260,7 @@ not (user.isAdmin or user.isManager)
 
 ## Comparison Operators
 
-PTE expressions should support these comparison operators:
+Piped expressions should support these comparison operators:
 
 ```txt
 ==
@@ -305,7 +305,7 @@ The optional `|else|` block renders when the collection is empty or missing.
 
 ## Each Metadata
 
-Inside an `each` block, PTE should expose **each metadata**.
+Inside an `each` block, Piped should expose **each metadata**.
 
 Official syntax:
 
@@ -343,24 +343,9 @@ Example:
 </table>
 ```
 
-PTE intentionally avoids `$each` and `$loop`.
-
-Use this:
-
-```html
-|each.index|
-```
-
-Not this:
-
-```html
-|$each.index|
-|$loop.index|
-```
-
 ## Switch Rendering
 
-PTE supports `|switch expr|` for multi-branch rendering.
+Piped supports `|switch expr|` for multi-branch rendering.
 
 Basic example:
 
@@ -400,7 +385,7 @@ If no case matches, the optional `default` block is rendered:
 
 ## Switch Does Not Fall Through by Default
 
-PTE switch cases automatically break by default.
+Piped switch cases automatically break by default.
 
 That means this:
 
@@ -488,7 +473,7 @@ Switch syntax summary:
 
 ## Include and Partial Rendering
 
-PTE uses `|include expr|` to render another template or partial.
+Piped uses `|include expr|` to render another template or partial.
 
 ```html
 |include partials/header|
@@ -502,7 +487,7 @@ PTE uses `|include expr|` to render another template or partial.
 
 `|include expr|` is the official include syntax.
 
-PTE intentionally avoids:
+Piped intentionally avoids:
 
 ```html
 |partial expr|
@@ -543,7 +528,7 @@ instead of:
 
 ## Optional Chaining and Fallback
 
-PTE should support optional chaining with `?.`.
+Piped should support optional chaining with `?.`.
 
 ```html
 <p>Hello, |user?.profile?.displayName|</p>
@@ -551,7 +536,7 @@ PTE should support optional chaining with `?.`.
 
 If `user` or `profile` is missing, the expression returns nothing instead of throwing.
 
-PTE should also support fallback with `??`.
+Piped should also support fallback with `??`.
 
 ```html
 <p>Hello, |user?.profile?.displayName ?? "Guest"|</p>
@@ -573,7 +558,7 @@ Otherwise use "Walk-in Customer".
 
 ## Design Rules
 
-PTE follows these design decisions:
+Piped follows these design decisions:
 
 ```txt
 |expr|              escaped HTML output
@@ -728,7 +713,7 @@ String html = engine.render(
         "post", Map.of(
             "title", "Building Piped Template Engine",
             "author", Map.of("name", "Lemuel Adane"),
-            "bodyHtml", "<p>PTE is a <strong>server-side</strong> template engine.</p>"
+            "bodyHtml", "<p>Piped is a <strong>server-side</strong> template engine.</p>"
         )
     )
 );
@@ -744,14 +729,14 @@ Expected output:
   <p>By Lemuel Adane</p>
 
   <div>
-    <p>PTE is a <strong>server-side</strong> template engine.</p>
+    <p>Piped is a <strong>server-side</strong> template engine.</p>
   </div>
 </article>
 ```
 
 ## Partial Rendering Goal
 
-PTE should support rendering full pages and partial fragments.
+Piped should support rendering full pages and partial fragments.
 
 Full page rendering:
 
@@ -765,12 +750,12 @@ Partial rendering:
 String html = engine.renderPartial("partials/product-card", product);
 ```
 
-This makes PTE useful for HTMX applications.
+This makes Piped useful for HTMX applications.
 
-PTE renders the HTML fragment on the server. HTMX can then request that fragment and swap it into the existing page.
+Piped renders the HTML fragment on the server. HTMX can then request that fragment and swap it into the existing page.
 
 ```txt
-PTE  = creates HTML
+Piped  = creates HTML
 HTMX = requests and swaps HTML
 ```
 
@@ -965,7 +950,7 @@ com.piped.template.loader
 
 ## Philosophy
 
-PTE should stay small and understandable.
+Piped should stay small and understandable.
 
 Core principles:
 
