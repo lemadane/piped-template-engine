@@ -321,8 +321,8 @@ Official syntax:
 Definitions:
 
 ```txt
-each.index   = 1-based index
-each.index0  = 0-based index
+each.index   = 1-based index (always starts with 1)
+each.index0  = 0-based index (always starts with 0)
 each.first   = true if current item is first
 each.last    = true if current item is last
 each.even    = true if 1-based index is even
@@ -342,6 +342,134 @@ Example:
   |/each|
 </table>
 ```
+
+## Piped support map looping separately from list looping.
+
+This is the official syntax:
+
+```html
+|each key, value in map|
+  ...
+|/each|
+```
+
+Example:
+
+```html
+<ul>
+  |each field, message in errors|
+    <li>
+      <strong>|field|</strong>: |message|
+    </li>
+  |else|
+    <li>No errors.</li>
+  |/each|
+</ul>
+'''
+
+Given this Java model:
+
+```java
+Map<String, Object> model = Map.of(
+    "errors", Map.of(
+        "email", "Email is required.",
+        "password", "Password must be at least 8 characters."
+    )
+);
+```
+
+It renders like:
+
+```html
+<ul>
+  <li>
+    <strong>email</strong>: Email is required.
+  </li>
+  <li>
+    <strong>password</strong>: Password must be at least 8 characters.
+  </li>
+</ul>
+```
+Map loop with each metadata
+
+Each metadata should still work:
+
+```html
+<table>
+  |each key, value in settings|
+    <tr>
+      <td>|each.index|</td>
+      <td>|key|</td>
+      <td>|value|</td>
+    </tr>
+  |/each|
+</table>
+```
+
+So inside a map loop, we have:
+
+```doc
+key          current map key
+value        current map value
+each.index   1-based index
+each.first   true if first entry
+each.last    true if last entry
+each.even    true if each.index is even
+each.odd     true if each.index is odd
+Example with product prices
+```
+
+```html
+<ul>
+  |each productName, price in prices|
+    <li>|productName| - ₱|price|</li>
+  |/each|
+</ul>
+```
+
+Model:
+```java
+Map<String, Object> model = Map.of(
+    "prices", Map.of(
+        "Rice", 120,
+        "Coffee", 150,
+        "Sugar", 90
+    )
+);
+```
+
+Alternative syntax: entry style
+
+We also support this:
+
+```html
+|each entry in settings|
+  <p>|entry.key| = |entry.value|</p>
+|/each|
+```
+
+This maps naturally to Java’s Map.Entry.
+
+Recommended PTE rule
+
+For collections:
+```html
+|each product in products|
+  |product.name|
+|/each|
+
+For maps:
+
+|each key, value in map|
+  |key| = |value|
+|/each|
+
+|each entry in map|
+  |entry.key| = |entry.value|
+|/each|
+```
+
+Important Java note: if output order matters, pass a LinkedHashMap, not a plain HashMap, because HashMap does not guarantee display order.
 
 ## Switch Rendering
 
@@ -574,6 +702,10 @@ Piped follows these design decisions:
 |/if|               explicit if-block closing
 |/each|             explicit each-block closing
 |/switch|           explicit switch-block closing
+|# a comment|       one line comment
+|#
+   block comment    multi-line or block comment
+#|     
 not                 boolean NOT
 and                 boolean AND
 or                  boolean OR
@@ -583,21 +715,6 @@ nor                 boolean NOR
 ??                  fallback value
 ```
 
-The following syntax is intentionally avoided:
-
-```txt
-|! expr|            avoided because not should be used for negation
-|< expr|            avoided because < is confusing inside HTML
-|partial expr|      avoided in favor of |include expr|
-||expr||            avoided because or should be used for boolean OR
-|$ expr|            avoided for normal output
-|& expr|            avoided because & is confusing with HTML entities
-!                   avoided in official syntax; use not
-&&                  avoided in official syntax; use and
-||                  avoided in official syntax; use or
-$each.index         avoided; use each.index
-$loop.index         avoided; use each.index
-```
 
 ## Requirements
 
@@ -632,26 +749,7 @@ piped-template-java/
               TemplateEngineTest.java
 ```
 
-## Getting Started
 
-Create the project:
-
-```bash
-mkdir piped-template-java
-cd piped-template-java
-```
-
-Run the tests:
-
-```bash
-./gradlew test
-```
-
-On Windows PowerShell:
-
-```powershell
-.\gradlew.bat test
-```
 
 ## Current Minimal Usage
 
@@ -748,6 +846,37 @@ Partial rendering:
 
 ```java
 String html = engine.renderPartial("partials/product-card", product);
+```
+
+This makes Piped useful for HTMX applications.
+
+Piped renders the HTML fragment on the server. HTMX can then request that fragment and swap it into the existing page.
+
+```txt
+Piped  = creates HTML
+HTMX = requests and swaps HTML
+```
+
+## Comment Syntax
+
+One line comment:
+
+```html
+<h1>|title|</h1>
+
+|# This is a commend and will be removed during rendering. |
+
+<p>Hello, |user.name|</p>
+```
+
+Block comment:
+
+```html
+|#
+  This whole section is ignored.
+  It can contain notes, reminders,
+  or disabled template code.
+#|
 ```
 
 This makes Piped useful for HTMX applications.
