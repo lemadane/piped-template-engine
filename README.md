@@ -154,9 +154,7 @@ class="|attr className|"
 |/if|
 ```
 
-Piped uses readable word-based boolean operators instead of symbolic JavaScript-style operators.
-
-Recommended:
+Piped uses readable word-based boolean operators instead of symbolic C-style operators.
 
 ```html
 |if not user|
@@ -450,7 +448,7 @@ We also support this:
 
 This maps naturally to Java’s Map.Entry.
 
-Recommended PTE rule
+Piped rule
 
 For collections:
 ```html
