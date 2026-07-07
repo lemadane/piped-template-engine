@@ -18,48 +18,48 @@ PTE is currently in active early development.
 Implemented and covered:
 
 ```txt
-✅ String rendering
-✅ File-based page rendering
-✅ Partial rendering
-✅ HTML-escaped output
-✅ Trusted HTML output
-✅ Attribute-safe output
-✅ URL-safe output
-✅ JSON-safe output
-✅ Comments
-✅ If / else-if / else conditionals
-✅ Truthy/falsy evaluation
-✅ Boolean operators
-✅ Comparison operators
-✅ Each loops
-✅ Map loops
-✅ Each metadata
-✅ Switch blocks
-✅ Explicit switch fallthrough
-✅ Optional chaining
-✅ Null coalescing
-✅ Ternary operator
-✅ Includes and partials
-✅ Circular include detection
-✅ Layouts, sections, and yield
-✅ Components and named slots
-✅ Comma filters
-✅ Date and time filters
+(done) String rendering
+(done) File-based page rendering
+(done) Partial rendering
+(done) HTML-escaped output
+(done) Trusted HTML output
+(done) Attribute-safe output
+(done) URL-safe output
+(done) JSON-safe output
+(done) Comments
+(done) If / else-if / else conditionals
+(done) Truthy/falsy evaluation
+(done) Boolean operators
+(done) Comparison operators
+(done) Each loops
+(done) Map loops
+(done) Each metadata
+(done) Switch blocks
+(done) Explicit switch fallthrough
+(done) Optional chaining
+(done) Null coalescing
+(done) Ternary operator
+(done) Includes and partials
+(done) Circular include detection
+(done) Layouts, sections, and yield
+(done) Components and named slots
+(done) Comma filters
+(done) Date and time filters
 ```
 
 Still planned:
 
 ```txt
-❌ Automatic whitespace cleanup
-❌ Better error messages with line/column
-❌ Template caching
-❌ Custom user-defined filters
-❌ Builder/config API
-❌ Optional .piped.html extension support
-❌ Spring Boot MVC integration
-❌ HTMX controller demo
-❌ Unit and integration test coverage
-❌ Internal tokenizer/parser/AST refactor
+(pending) Automatic whitespace cleanup
+(pending) Better error messages with line/column
+(pending) Template caching
+(pending) Custom user-defined filters
+(pending) Builder/config API
+(pending) Optional .piped.html extension support
+(pending) Spring Boot MVC integration
+(pending) HTMX controller demo
+(pending) Unit and integration test coverage
+(pending) Internal tokenizer/parser/AST refactor
 ```
 
 ---
