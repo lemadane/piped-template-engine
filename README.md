@@ -1,6 +1,6 @@
 # Piped Template Engine
 
-**Piped Template Engine**, or **PTE**, is a lightweight Java server-side template engine that uses readable pipe-based syntax for HTML rendering.
+**Piped Template Engine**, or **PTE**, is an elegant, lightweight Java server-side template engine that uses readable pipe-based syntax for HTML rendering.
 
 ```html
 <h1>|title|</h1>
