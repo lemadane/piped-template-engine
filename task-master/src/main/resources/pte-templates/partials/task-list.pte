@@ -1,0 +1,33 @@
+<!-- Stats Panel -->
+<div id="stats-panel" class="columns is-mobile mb-4">
+    <div class="column">
+        <div class="stat-card">
+            <span class="stat-val">|totalCount|</span>
+            <span class="stat-label">Total</span>
+        </div>
+    </div>
+    <div class="column">
+        <div class="stat-card">
+            <span class="stat-val" style="color: var(--md-success);">|completedCount|</span>
+            <span class="stat-label">Completed</span>
+        </div>
+    </div>
+    <div class="column">
+        <div class="stat-card">
+            <span class="stat-val" style="color: var(--md-primary);">|activeCount|</span>
+            <span class="stat-label">Active</span>
+        </div>
+    </div>
+</div>
+
+<!-- Tasks List Container -->
+<ul id="tasks-container" class="task-container-scroll">
+    |each task in tasks|
+        |include partials/task-item with task|
+    |else|
+        <div class="empty-state">
+            <i class="material-icons">assignment_late</i>
+            <p>No tasks yet! Add one above to get started.</p>
+        </div>
+    |/each|
+</ul>

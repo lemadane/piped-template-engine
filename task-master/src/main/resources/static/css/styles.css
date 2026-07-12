@@ -1,0 +1,287 @@
+/* Material Design Variables (Dark Mode with Emerald Green Accent) */
+:root {
+  --md-primary: #00c076;
+  --md-primary-variant: #1e7e56;
+  --md-secondary: #02c076;
+  --md-background: #17191b;
+  --md-surface: #202325;
+  --md-error: #ff1744;
+  --md-text-primary: #e3e6e8;
+  --md-text-secondary: #8d9195;
+  --md-border: rgba(255, 255, 255, 0.1);
+  --md-success: #00c076;
+  
+  /* Elevation Shadows */
+  --elevation-1: 0px 2px 1px -1px rgba(0,0,0,0.3), 0px 1px 1px 0px rgba(0,0,0,0.2), 0px 1px 3px 0px rgba(0,0,0,0.18);
+  --elevation-2: 0px 3px 1px -2px rgba(0,0,0,0.3), 0px 2px 2px 0px rgba(0,0,0,0.2), 0px 1px 5px 0px rgba(0,0,0,0.18);
+  --elevation-4: 0px 2px 4px -1px rgba(0,0,0,0.3), 0px 4px 5px 0px rgba(0,0,0,0.2), 0px 1px 10px 0px rgba(0,0,0,0.18);
+  --elevation-8: 0px 5px 5px -3px rgba(0,0,0,0.3), 0px 8px 10px 1px rgba(0,0,0,0.2), 0px 3px 14px 2px rgba(0,0,0,0.18);
+}
+
+/* Base Body Override with Emerald Green Radial Gradients */
+body {
+  background-color: var(--md-background);
+  color: var(--md-text-primary);
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(0, 192, 118, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(3, 218, 198, 0.05) 0%, transparent 45%);
+}
+
+/* Container width */
+.container {
+  max-width: 650px !important;
+  width: 100%;
+}
+
+/* Material Card utilizing Bulma's .box */
+.box.material-card {
+  background-color: var(--md-surface);
+  border-radius: 16px;
+  box-shadow: var(--elevation-4);
+  border: none;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.box.material-card:hover {
+  box-shadow: var(--elevation-8);
+}
+
+/* Headers */
+.app-title {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--md-primary);
+}
+
+.app-subtitle {
+  color: var(--md-text-secondary);
+  font-size: 0.95rem;
+}
+
+/* Material Outline Input Field */
+.input.material-input {
+  border-radius: 8px !important;
+  border: 1.5px solid var(--md-border) !important;
+  height: 50px !important;
+  padding: 0 1.2rem !important;
+  box-shadow: none !important;
+  font-family: inherit !important;
+  background-color: var(--md-surface) !important;
+  color: var(--md-text-primary) !important;
+  transition: all 0.2s ease !important;
+}
+
+.input.material-input:focus {
+  border-color: var(--md-primary) !important;
+  background-color: var(--md-surface) !important;
+  color: var(--md-text-primary) !important;
+  box-shadow: 0 0 0 2px rgba(98, 0, 238, 0.15) !important;
+}
+
+/* Material Raised Button */
+.button.material-btn-primary {
+  background-color: var(--md-primary);
+  color: #ffffff;
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.25px;
+  box-shadow: var(--elevation-1);
+  border: none;
+  height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+  transition: all 0.2s ease;
+}
+
+.button.material-btn-primary:hover {
+  background-color: var(--md-primary-variant);
+  color: #ffffff;
+  box-shadow: var(--elevation-2);
+}
+
+.button.material-btn-primary:active {
+  box-shadow: var(--elevation-1);
+  transform: translateY(1px);
+}
+
+/* Stats Dashboard Card */
+.stat-card {
+  background: rgba(0, 192, 118, 0.04);
+  border: 1px solid rgba(0, 192, 118, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  background: rgba(0, 192, 118, 0.08);
+  transform: translateY(-2px);
+}
+
+.stat-val {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--md-text-primary);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--md-text-secondary);
+}
+
+/* Task Item */
+.task-item {
+  border-bottom: 1px solid var(--md-border);
+  padding: 1rem 0.5rem;
+  transition: all 0.2s ease;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.task-item:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.task-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+.task-title {
+  font-size: 1rem;
+  color: var(--md-text-primary);
+  transition: all 0.25s ease;
+}
+
+.task-item.completed .task-title {
+  text-decoration: line-through;
+  color: var(--md-text-secondary);
+}
+
+/* Material Checkbox */
+.checkbox-wrapper {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.checkbox-wrapper input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.checkbox-custom {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background: transparent;
+  border: 2px solid var(--md-text-secondary);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.checkbox-wrapper input:checked + .checkbox-custom {
+  background: var(--md-primary);
+  border-color: var(--md-primary);
+}
+
+.checkbox-custom:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-wrapper input:checked + .checkbox-custom:after {
+  display: block;
+}
+
+/* Delete Button (Flat Circular) */
+.btn-delete {
+  background: transparent;
+  border: none;
+  color: var(--md-text-secondary);
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-delete:hover {
+  background-color: rgba(176, 0, 32, 0.08);
+  color: var(--md-error);
+}
+
+/* Scrollable Container for Tasks */
+.task-container-scroll {
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.task-container-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.task-container-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.task-container-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  color: var(--md-text-secondary);
+  padding: 2.5rem 1rem;
+  font-size: 0.95rem;
+}
+
+.empty-state i {
+  font-size: 2.5rem;
+  color: var(--md-border);
+  margin-bottom: 0.5rem;
+  display: block;
+}

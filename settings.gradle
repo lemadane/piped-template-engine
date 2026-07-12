@@ -12,4 +12,6 @@ plugins {
 }
 
 rootProject.name = 'piped-template-engine'
-include('lib')
+include('piped-template-engine-core')
+include('piped-template-engine-spring-boot-starter')
+include('task-master')

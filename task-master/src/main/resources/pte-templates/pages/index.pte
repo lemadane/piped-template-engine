@@ -1,0 +1,30 @@
+|layout layouts/main|
+
+|section title|
+   TaskMaster - Piped Template Engine
+|/section|
+
+|section content|
+<div class="box material-card">
+    <!-- Header -->
+    <div class="has-text-centered mb-5">
+        <h1 class="title is-3 app-title mb-2">TaskMaster</h1>
+        <p class="subtitle is-6 app-subtitle">A high-performance TODO app powered by Piped & Spring Boot</p>
+    </div>
+
+    <!-- Wrapper for dynamic content (Stats + Task List) -->
+    <div id="todo-content">
+        |include partials/task-list|
+    </div>
+
+    <!-- Task Add Form -->
+    <form class="is-flex mb-5" style="gap: 1rem;" hx-post="/tasks" hx-target="#todo-content" hx-swap="innerHTML" hx-on::after-request="this.reset()">
+        <div class="control is-expanded" style="flex-grow: 1;">
+            <input type="text" name="title" class="input material-input" placeholder="What needs to be done?" required autofocus autocomplete="off">
+        </div>
+        <div class="control">
+            <button type="submit" class="button material-btn-primary">Add Task</button>
+        </div>
+    </form>
+</div>
+|/section|
