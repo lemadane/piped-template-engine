@@ -13,7 +13,7 @@ java {
 }
 
 application {
-    mainClass = 'com.piped.template.Main'
+    mainClass = 'com.piped.template.engine.Main'
 }
 
 repositories {
@@ -22,8 +22,30 @@ repositories {
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+
+    testLogging {
+        events "started", "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+}
+
+allprojects {
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+        testLogging {
+            events "started", "passed", "skipped", "failed"
+            exceptionFormat "full"
+            showStandardStreams = true
+        }
+    }
 }

@@ -100,7 +100,7 @@ Output:
 ### Render a file-based page
 
 ```java
-TemplateEngine engine = new TemplateEngine(Path.of("src/main/piped"));
+TemplateEngine engine = new TemplateEngine(Path.of("src/main/templates"));
 
 String html = engine.render("pages/products", model);
 ```
@@ -917,7 +917,7 @@ Avoided syntax:
 Example structure:
 
 ```txt
-piped-template-java/
+piped-template-engine-java/
   settings.gradle
   build.gradle
   README.md

@@ -1,0 +1,15 @@
+<li class="product-card |attr available ? 'is-available' : 'is-sold-out'|">
+   <strong>|name|</strong>
+   <span>₱|price|</span>
+   |if available|
+      <span>Available</span>
+   |else|
+      <span>Sold out</span>
+   |/if|
+
+   |if tags|
+      <small>Has tags</small>
+   |else|
+      <small>No tags</small>
+   |/if|
+</li>
