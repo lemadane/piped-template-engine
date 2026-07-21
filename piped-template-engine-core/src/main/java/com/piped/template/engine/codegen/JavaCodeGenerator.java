@@ -72,6 +72,15 @@ public final class JavaCodeGenerator {
             generateNodeSource(sepNode.getBody(), sb, indent);
         } else if (node instanceof com.piped.template.engine.ast.FragmentNode fragNode) {
             generateNodeSource(fragNode.getBody(), sb, indent);
+        } else if (node instanceof com.piped.template.engine.ast.MinifyNode minifyNode) {
+            sb.append(indent).append("{\n");
+            sb.append(indent).append("    java.io.StringWriter sw = new java.io.StringWriter();\n");
+            sb.append(indent).append("    java.io.Writer prevWriter = writer;\n");
+            sb.append(indent).append("    writer = sw;\n");
+            generateNodeSource(minifyNode.getBody(), sb, indent + "    ");
+            sb.append(indent).append("    writer = prevWriter;\n");
+            sb.append(indent).append("    writer.write(com.piped.template.engine.utils.HtmlFormatter.minifyHtml(sw.toString()));\n");
+            sb.append(indent).append("}\n");
         }
     }
 

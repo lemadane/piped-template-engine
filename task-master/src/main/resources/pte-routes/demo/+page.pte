@@ -43,6 +43,18 @@
                 <p style="color: #00c076; font-weight: bold; margin: 0;">This block is inside an inline fragment! Only this block can be rendered independently.</p>
             |/fragment|
         </div>
+
+        <hr style="border-color: #202325; margin: 2rem 0;">
+
+        <!-- 4. Minification Demo -->
+        <h2 style="color: #00c076; font-size: 1.5rem;">4. HTML Minification</h2>
+        <div style="padding: 1rem; background-color: #202325; border-radius: 8px; margin-top: 1rem;">
+            |minify|
+                <p style="color: #00c076; font-weight: bold; margin: 0;">
+                    This whole block is compressed and minified to remove unnecessary spaces in output source HTML!
+                </p>
+            |/minify|
+        </div>
     </div>
 </body>
 </html>

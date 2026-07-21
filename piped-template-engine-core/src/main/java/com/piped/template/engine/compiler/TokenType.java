@@ -34,5 +34,7 @@ public enum TokenType {
     SEPARATOR,
     END_SEPARATOR,
     FRAGMENT,
-    END_FRAGMENT
+    END_FRAGMENT,
+    MINIFY,
+    END_MINIFY
 }

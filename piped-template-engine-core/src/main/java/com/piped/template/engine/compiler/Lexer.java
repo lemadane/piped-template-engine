@@ -117,6 +117,10 @@ public final class Lexer {
             return TokenType.FRAGMENT;
         } else if ("/fragment".equals(content)) {
             return TokenType.END_FRAGMENT;
+        } else if ("minify".equals(content)) {
+            return TokenType.MINIFY;
+        } else if ("/minify".equals(content)) {
+            return TokenType.END_MINIFY;
         }
         return TokenType.EXPRESSION;
     }

@@ -72,6 +72,14 @@ public final class TemplateEngine {
     private final com.piped.template.engine.compiler.TemplateCache templateCache;
     private final com.piped.template.engine.compiler.Lexer lexer;
     private final com.piped.template.engine.compiler.Parser parser;
+    private boolean minify = false;
+    private boolean prettify = false;
+
+    public boolean isMinify() { return minify; }
+    public void setMinify(boolean minify) { this.minify = minify; }
+
+    public boolean isPrettify() { return prettify; }
+    public void setPrettify(boolean prettify) { this.prettify = prettify; }
 
     public TemplateEngine() {
         this(null, Map.of());
@@ -262,11 +270,19 @@ public final class TemplateEngine {
     private String renderTemplateSource(String template, TemplateContext context) {
         final var layoutDirective = findLayoutDirective(template);
 
+        String result;
         if (layoutDirective != null) {
-            return renderTemplateWithLayout(template, context, layoutDirective);
+            result = renderTemplateWithLayout(template, context, layoutDirective);
+        } else {
+            result = renderRange(template, context, 0, template.length());
         }
 
-        return renderRange(template, context, 0, template.length());
+        if (minify) {
+            result = com.piped.template.engine.utils.HtmlFormatter.minifyHtml(result);
+        } else if (prettify) {
+            result = com.piped.template.engine.utils.HtmlFormatter.prettifyHtml(result);
+        }
+        return result;
     }
 
     private String renderInclude(String source, TemplateContext context) {

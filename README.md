@@ -351,3 +351,26 @@ PTE tracks the active include stack at render-time and throws a compile-time exc
 <!-- PTE throws: circular include detected: index -> navbar -> index -->
 |include partials/navbar|
 ```
+
+---
+
+### 20. HTML Minification & Prettifying
+Compress raw templates using the block-level `|minify|` tag, or configure the engine globally to minify or prettify (beautify) all rendered page sources automatically.
+
+```html
+<!-- Inline Block Minification -->
+|minify|
+    <div class="row">
+        <span>Compressed Text</span>
+    </div>
+|/minify|
+```
+
+Invoke via Java API:
+```java
+// Globally minify all templates (collapses comments/whitespaces at compile time)
+templateEngine.setMinify(true);
+
+// Globally format/indent HTML output
+templateEngine.setPrettify(true);
+```

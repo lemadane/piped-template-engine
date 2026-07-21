@@ -64,6 +64,7 @@ public final class Parser {
                     nodes.add(new com.piped.template.engine.ast.SeparatorNode(sepBody));
                 }
                 case FRAGMENT -> nodes.add(parseFragment(token, cursor));
+                case MINIFY -> nodes.add(parseMinify(token, cursor));
                 default -> {
                     var outputExpr = outputExpressionParser.parse(token.value());
                     nodes.add(new ExpressionNode(outputExpr, evaluator));
@@ -207,6 +208,14 @@ public final class Parser {
             cursor.next();
         }
         return new com.piped.template.engine.ast.FragmentNode(name, body);
+    }
+
+    private com.piped.template.engine.ast.MinifyNode parseMinify(Token minifyToken, Cursor cursor) {
+        ASTNode body = parseBlock(cursor, TokenType.END_MINIFY);
+        if (cursor.hasNext() && cursor.peek().type() == TokenType.END_MINIFY) {
+            cursor.next();
+        }
+        return new com.piped.template.engine.ast.MinifyNode(body);
     }
 
     private static class Cursor {
