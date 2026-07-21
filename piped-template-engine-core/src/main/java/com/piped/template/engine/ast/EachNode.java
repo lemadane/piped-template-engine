@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ public final class EachNode implements ASTNode {
     private final String collectionExpression;
     private final ASTNode bodyBlock;
     private final ASTNode elseBlock;
+    private final ASTNode separatorNode;
     private final ExpressionEvaluator evaluator;
 
     public EachNode(
@@ -22,12 +24,27 @@ public final class EachNode implements ASTNode {
             String collectionExpression,
             ASTNode bodyBlock,
             ASTNode elseBlock,
+            ASTNode separatorNode,
             ExpressionEvaluator evaluator) {
         this.itemName = itemName;
         this.collectionExpression = collectionExpression;
         this.bodyBlock = bodyBlock;
         this.elseBlock = elseBlock;
+        this.separatorNode = separatorNode;
         this.evaluator = evaluator;
+    }
+
+    public EachNode(
+            String itemName,
+            String collectionExpression,
+            ASTNode bodyBlock,
+            ASTNode elseBlock,
+            ExpressionEvaluator evaluator) {
+        this(itemName, collectionExpression, bodyBlock, elseBlock, null, evaluator);
+    }
+
+    public ASTNode getSeparatorNode() {
+        return separatorNode;
     }
 
     @Override
@@ -36,9 +53,31 @@ public final class EachNode implements ASTNode {
         Iterable<?> items = toIterable(rawValue);
 
         if (items != null && items.iterator().hasNext()) {
-            for (Object item : items) {
-                TemplateContext subContext = context.subContext(Map.of(itemName, item == null ? "" : item));
+            List<Object> itemList = new ArrayList<>();
+            items.forEach(itemList::add);
+            int total = itemList.size();
+
+            for (int i = 0; i < total; i++) {
+                Object item = itemList.get(i);
+                boolean isLast = (i == total - 1);
+                Map<String, Object> loopMeta = Map.of(
+                    "index", i,
+                    "count", i + 1,
+                    "first", i == 0,
+                    "last", isLast,
+                    "total", total
+                );
+
+                Map<String, Object> scope = new HashMap<>();
+                scope.put(itemName, item == null ? "" : item);
+                scope.put("each", loopMeta);
+
+                TemplateContext subContext = context.subContext(scope);
                 bodyBlock.render(subContext, writer);
+
+                if (separatorNode != null && !isLast) {
+                    separatorNode.render(subContext, writer);
+                }
             }
         } else if (elseBlock != null) {
             elseBlock.render(context, writer);

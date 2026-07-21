@@ -27,5 +27,10 @@ public enum TokenType {
     MODEL,
     FIELD,
     DISPLAY,
-    EDITOR
+    EDITOR,
+    MACRO,
+    END_MACRO,
+    CALL,
+    SEPARATOR,
+    END_SEPARATOR
 }

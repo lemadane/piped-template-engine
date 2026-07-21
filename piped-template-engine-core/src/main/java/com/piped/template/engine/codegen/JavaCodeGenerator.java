@@ -50,6 +50,26 @@ public final class JavaCodeGenerator {
         } else if (node instanceof com.piped.template.engine.ast.EditorNode editorNode) {
             sb.append(indent).append("new com.piped.template.engine.ast.EditorNode(")
                     .append(escapeStringLiteral(editorNode.getPropertyPath())).append(", new com.piped.template.engine.expression.ExpressionEvaluator()).render(context, writer);\n");
+        } else if (node instanceof com.piped.template.engine.ast.MacroNode macroNode) {
+            sb.append(indent).append("new com.piped.template.engine.ast.MacroNode(")
+                    .append(escapeStringLiteral(macroNode.getName())).append(", ")
+                    .append("java.util.List.of(");
+            for (int i = 0; i < macroNode.getParameters().size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(escapeStringLiteral(macroNode.getParameters().get(i)));
+            }
+            sb.append("), null).render(context, writer);\n");
+        } else if (node instanceof com.piped.template.engine.ast.CallMacroNode callNode) {
+            sb.append(indent).append("new com.piped.template.engine.ast.CallMacroNode(")
+                    .append(escapeStringLiteral(callNode.getMacroName())).append(", ")
+                    .append("java.util.List.of(");
+            for (int i = 0; i < callNode.getArgumentExpressions().size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(escapeStringLiteral(callNode.getArgumentExpressions().get(i)));
+            }
+            sb.append("), new com.piped.template.engine.expression.ExpressionEvaluator()).render(context, writer);\n");
+        } else if (node instanceof com.piped.template.engine.ast.SeparatorNode sepNode) {
+            generateNodeSource(sepNode.getBody(), sb, indent);
         }
     }
 

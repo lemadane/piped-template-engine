@@ -18,6 +18,7 @@
 - **🐣 Simple & Readable**: Write variables as `|name|` instead of complex syntax.
 - **🚀 Blazing Fast**: Compiles templates directly in RAM for native Java execution speed.
 - **📁 File-Based Routing**: Works like SvelteKit—just drop a `+page.pte` file into a folder to create a web route!
+- **🔁 Loop Separators**: Built-in `|separator|` directive for clean lists and breadcrumbs without repetitive `if (!last)` checks.
 - **🍃 Spring Boot Ready**: Seamless integration with Spring MVC.
 - **⚡ HTMX Friendly**: Perfect for modern, dynamic single-page interactions without heavy JavaScript.
 - **🛡️ Safe**: Automatically prevents XSS security vulnerabilities by default.
@@ -92,6 +93,20 @@ The `[id]` parameter is automatically available in your template:
 |editor model.form.email|
 ```
 
+### 3. Template-Defined Macros (Twig-Style)
+Define reusable HTML helper macros and invoke them anywhere:
+
+```html
+<!-- Define a Macro -->
+|macro input(name, value, type)|
+    <input type="|type ?? 'text'|" name="|name|" value="|value|" class="input">
+|/macro|
+
+<!-- Call a Macro -->
+|call input('username', user.name)|
+|call input('email', user.email, 'email')|
+```
+
 ### 2. Default Values & Optional Chaining
 ```html
 <!-- If user.profile is missing, fallback to 'Guest' -->
@@ -110,15 +125,20 @@ The `[id]` parameter is automatically available in your template:
 |/if|
 ```
 
-### 4. Loops
+### 4. Loops & Separators
 ```html
-<ul>
+<!-- Comma-Separated List with |separator| (Renders between items except the last) -->
+|each tag in tags||tag||separator|, |/separator||/each|
+
+<!-- HTML List with Dividers -->
 |each item in items|
-    <li>|item.title|</li>
+    <span>|item.title|</span>
+    |separator|
+        <span class="divider">/</span>
+    |/separator|
 |else|
     <p>No items found.</p>
 |/each|
-</ul>
 ```
 
 ### 5. Layouts (Reusing Headers & Footers)

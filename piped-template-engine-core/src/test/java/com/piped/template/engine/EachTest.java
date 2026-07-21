@@ -42,6 +42,24 @@ class EachTest {
       }
 
       @Test
+      @DisplayName("Renders separator between items except the last")
+      void rendersSeparatorBetweenItems() {
+         final var html = engine.renderString(
+               "|each tag in tags||tag||separator|, |/separator||/each|",
+               Map.of("tags", List.of("java", "spring", "pte")));
+
+         org.junit.jupiter.api.Assertions.assertEquals("java, spring, pte", html);
+      }
+
+      @Test
+      @DisplayName("Throws syntax error when separator is outside each loop")
+      void throwsErrorWhenSeparatorOutsideLoop() {
+         assertThrows(TemplateSyntaxException.class, () -> {
+            engine.renderString("|separator|, |/separator|", Map.of());
+         });
+      }
+
+      @Test
       @DisplayName("Renders else block when list is empty")
       void rendersElseBlockWhenListIsEmpty() {
          final var html = engine.renderString(

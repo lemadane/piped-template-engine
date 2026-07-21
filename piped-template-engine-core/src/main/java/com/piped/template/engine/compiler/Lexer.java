@@ -103,6 +103,16 @@ public final class Lexer {
             return TokenType.DISPLAY;
         } else if (content.startsWith("editor ")) {
             return TokenType.EDITOR;
+        } else if (content.startsWith("macro ")) {
+            return TokenType.MACRO;
+        } else if ("/macro".equals(content)) {
+            return TokenType.END_MACRO;
+        } else if (content.startsWith("call ")) {
+            return TokenType.CALL;
+        } else if ("separator".equals(content)) {
+            return TokenType.SEPARATOR;
+        } else if ("/separator".equals(content)) {
+            return TokenType.END_SEPARATOR;
         }
         return TokenType.EXPRESSION;
     }

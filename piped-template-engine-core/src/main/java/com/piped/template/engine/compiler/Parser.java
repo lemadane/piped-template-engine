@@ -51,6 +51,18 @@ public final class Parser {
                 case FIELD -> nodes.add(new FieldNode(token.value().substring("field ".length()).trim(), evaluator));
                 case DISPLAY -> nodes.add(new DisplayNode(token.value().substring("display ".length()).trim(), evaluator));
                 case EDITOR -> nodes.add(new EditorNode(token.value().substring("editor ".length()).trim(), evaluator));
+                case MACRO -> nodes.add(parseMacro(token, cursor));
+                case CALL -> nodes.add(parseCallMacro(token));
+                case SEPARATOR -> {
+                    if (eachDepth == 0) {
+                        throw new TemplateSyntaxException("|separator| is only allowed directly inside an |each| loop.");
+                    }
+                    ASTNode sepBody = parseBlock(cursor, TokenType.END_SEPARATOR);
+                    if (cursor.hasNext() && cursor.peek().type() == TokenType.END_SEPARATOR) {
+                        cursor.next();
+                    }
+                    nodes.add(new com.piped.template.engine.ast.SeparatorNode(sepBody));
+                }
                 default -> {
                     var outputExpr = outputExpressionParser.parse(token.value());
                     nodes.add(new ExpressionNode(outputExpr, evaluator));
@@ -93,29 +105,98 @@ public final class Parser {
         return new IfNode(condition, thenBlock, elseIfBranches, elseBlock, evaluator);
     }
 
+    private int eachDepth = 0;
+
     private EachNode parseEach(Token eachToken, Cursor cursor) {
-        String statement = eachToken.value().substring("each ".length()).trim();
-        int inIndex = statement.indexOf(" in ");
-        if (inIndex == -1) {
-            throw new TemplateSyntaxException("Invalid each statement format. Expected '|each item in items|'");
+        eachDepth++;
+        try {
+            String statement = eachToken.value().substring("each ".length()).trim();
+            int inIndex = statement.indexOf(" in ");
+            if (inIndex == -1) {
+                throw new TemplateSyntaxException("Invalid each statement format. Expected '|each item in items|'");
+            }
+
+            String itemName = statement.substring(0, inIndex).trim();
+            String collectionExpr = statement.substring(inIndex + 4).trim();
+
+            ASTNode bodyBlock = parseBlock(cursor, TokenType.END_EACH);
+            ASTNode elseBlock = null;
+
+            if (cursor.hasNext() && cursor.peek().type() == TokenType.ELSE) {
+                cursor.next();
+                elseBlock = parseBlock(cursor, TokenType.END_EACH);
+            }
+
+            if (cursor.hasNext() && cursor.peek().type() == TokenType.END_EACH) {
+                cursor.next();
+            }
+
+            ASTNode separatorNode = null;
+            if (bodyBlock instanceof BlockNode blockNode) {
+                List<ASTNode> bodyChildren = new ArrayList<>();
+                for (ASTNode child : blockNode.getChildren()) {
+                    if (child instanceof com.piped.template.engine.ast.SeparatorNode sep) {
+                        separatorNode = sep;
+                    } else {
+                        bodyChildren.add(child);
+                    }
+                }
+                bodyBlock = new BlockNode(bodyChildren);
+            }
+
+            return new EachNode(itemName, collectionExpr, bodyBlock, elseBlock, separatorNode, evaluator);
+        } finally {
+            eachDepth--;
+        }
+    }
+
+    private com.piped.template.engine.ast.MacroNode parseMacro(Token macroToken, Cursor cursor) {
+        String val = macroToken.value().substring("macro ".length()).trim();
+        int openParen = val.indexOf('(');
+        int closeParen = val.indexOf(')');
+
+        String name;
+        List<String> params = new ArrayList<>();
+        if (openParen != -1 && closeParen > openParen) {
+            name = val.substring(0, openParen).trim();
+            String argsStr = val.substring(openParen + 1, closeParen).trim();
+            if (!argsStr.isEmpty()) {
+                for (String p : argsStr.split(",")) {
+                    params.add(p.trim());
+                }
+            }
+        } else {
+            name = val;
         }
 
-        String itemName = statement.substring(0, inIndex).trim();
-        String collectionExpr = statement.substring(inIndex + 4).trim();
-
-        ASTNode bodyBlock = parseBlock(cursor, TokenType.END_EACH);
-        ASTNode elseBlock = null;
-
-        if (cursor.hasNext() && cursor.peek().type() == TokenType.ELSE) {
+        ASTNode body = parseBlock(cursor, TokenType.END_MACRO);
+        if (cursor.hasNext() && cursor.peek().type() == TokenType.END_MACRO) {
             cursor.next();
-            elseBlock = parseBlock(cursor, TokenType.END_EACH);
         }
 
-        if (cursor.hasNext() && cursor.peek().type() == TokenType.END_EACH) {
-            cursor.next();
+        return new com.piped.template.engine.ast.MacroNode(name, params, body);
+    }
+
+    private com.piped.template.engine.ast.CallMacroNode parseCallMacro(Token callToken) {
+        String val = callToken.value().substring("call ".length()).trim();
+        int openParen = val.indexOf('(');
+        int closeParen = val.lastIndexOf(')');
+
+        String name;
+        List<String> args = new ArrayList<>();
+        if (openParen != -1 && closeParen > openParen) {
+            name = val.substring(0, openParen).trim();
+            String argsStr = val.substring(openParen + 1, closeParen).trim();
+            if (!argsStr.isEmpty()) {
+                for (String arg : argsStr.split(",")) {
+                    args.add(arg.trim());
+                }
+            }
+        } else {
+            name = val;
         }
 
-        return new EachNode(itemName, collectionExpr, bodyBlock, elseBlock, evaluator);
+        return new com.piped.template.engine.ast.CallMacroNode(name, args, evaluator);
     }
 
     private static class Cursor {
