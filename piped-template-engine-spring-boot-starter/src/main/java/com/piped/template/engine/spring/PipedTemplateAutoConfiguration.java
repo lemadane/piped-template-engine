@@ -1,9 +1,14 @@
 package com.piped.template.engine.spring;
 
 import com.piped.template.engine.TemplateEngine;
+import com.piped.template.engine.spring.routing.PageDataLoader;
+import com.piped.template.engine.spring.routing.PageLoader;
+import com.piped.template.engine.spring.routing.PipedFileRouteHandlerMapping;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,5 +40,25 @@ public class PipedTemplateAutoConfiguration {
         resolver.setContentType(properties.getContentType());
         resolver.setOrder(properties.getOrder());
         return resolver;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public PipedFileRouteHandlerMapping pipedFileRouteHandlerMapping(
+            TemplateEngine pipedTemplateEngine,
+            ApplicationContext applicationContext) {
+        PipedFileRouteHandlerMapping mapping = new PipedFileRouteHandlerMapping(pipedTemplateEngine);
+
+        String[] beanNames = applicationContext.getBeanNamesForAnnotation(PageLoader.class);
+        for (String beanName : beanNames) {
+            Object bean = applicationContext.getBean(beanName);
+            if (bean instanceof PageDataLoader loader) {
+                PageLoader annotation = applicationContext.findAnnotationOnBean(beanName, PageLoader.class);
+                if (annotation != null) {
+                    mapping.registerPageDataLoader(annotation.value(), loader);
+                }
+            }
+        }
+        return mapping;
     }
 }

@@ -4,7 +4,6 @@ import com.piped.taskmaster.model.Task;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -62,9 +61,10 @@ public class TaskController {
 
     private void populateModel(Model model) {
         long totalCount = tasks.size();
-        long completedCount = tasks.stream().filter(Task::isCompleted).count();
+        long completedCount = tasks.stream()
+                .filter(task -> task != null && task.isCompleted())
+                .count();
         long activeCount = totalCount - completedCount;
-
         model.addAttribute("tasks", tasks);
         model.addAttribute("totalCount", totalCount);
         model.addAttribute("completedCount", completedCount);

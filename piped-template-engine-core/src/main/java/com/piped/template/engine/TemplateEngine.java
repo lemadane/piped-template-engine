@@ -69,6 +69,9 @@ public final class TemplateEngine {
     private final ThreadLocal<ArrayDeque<Map<String, String>>> sectionStack;
     private final ThreadLocal<ArrayDeque<Map<String, String>>> slotStack;
     private final Map<String, String> includedTemplates;
+    private final com.piped.template.engine.compiler.TemplateCache templateCache;
+    private final com.piped.template.engine.compiler.Lexer lexer;
+    private final com.piped.template.engine.compiler.Parser parser;
 
     public TemplateEngine() {
         this(null, Map.of());
@@ -90,6 +93,9 @@ public final class TemplateEngine {
         this.attributeEscaper = new AttributeEscaper();
         this.urlEscaper = new UrlEscaper();
         this.jsonEscaper = new JsonEscaper();
+        this.templateCache = new com.piped.template.engine.compiler.TemplateCache();
+        this.lexer = new com.piped.template.engine.compiler.Lexer();
+        this.parser = new com.piped.template.engine.compiler.Parser();
         this.templateRoot = (templateRoot == null
                 ? Path.of("src/main/resources/pte-templates")
                 : templateRoot).toAbsolutePath().normalize();
@@ -107,6 +113,37 @@ public final class TemplateEngine {
         this.sectionStack = ThreadLocal.withInitial(ArrayDeque::new);
         this.slotStack = ThreadLocal.withInitial(ArrayDeque::new);
         this.includedTemplates = normalizeIncludedTemplates(includedTemplates);
+    }
+
+    public com.piped.template.engine.compiler.CompiledTemplate compile(String template) {
+        return templateCache.computeIfAbsent(template, source -> parser.parse(lexer.tokenize(source)));
+    }
+
+    public com.piped.template.engine.codegen.CompiledTemplateExecutable compileToBytecode(String template) {
+        if (!com.piped.template.engine.codegen.InMemoryBytecodeCompiler.isAvailable()) {
+            return (context, writer, engine) -> compile(template).render(context, writer);
+        }
+        try {
+            var ast = compile(template).getRootNode();
+            String className = com.piped.template.engine.codegen.JavaCodeGenerator.generateUniqueClassName();
+            String javaSource = new com.piped.template.engine.codegen.JavaCodeGenerator().generateClassSource(ast, className);
+            Class<?> clazz = new com.piped.template.engine.codegen.InMemoryBytecodeCompiler().compile(className, javaSource);
+            return (com.piped.template.engine.codegen.CompiledTemplateExecutable) clazz.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            return (context, writer, engine) -> {
+                try {
+                    compile(template).render(context, writer);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            };
+        }
+    }
+
+    public String evaluateExpression(String expression, String modeName, TemplateContext context) {
+        OutputMode mode = OutputMode.valueOf(modeName);
+        Object value = expressionEvaluator.evaluate(expression, context);
+        return renderValue(mode, value);
     }
 
     private Map<String, String> normalizeIncludedTemplates(Map<String, String> includedTemplates) {

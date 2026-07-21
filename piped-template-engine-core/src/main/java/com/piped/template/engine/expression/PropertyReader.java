@@ -1,16 +1,25 @@
 package com.piped.template.engine.expression;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.piped.template.engine.exceptions.TemplateRenderException;
 import com.piped.template.engine.exceptions.TemplateSyntaxException;
 
 public final class PropertyReader {
+    private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+    private static final MethodHandle NULL_HANDLE = null;
+
+    private final Map<String, MethodHandle> handleCache = new ConcurrentHashMap<>();
+    private final Map<String, Path> pathCache = new ConcurrentHashMap<>();
+
     public Object readPath(String expression, TemplateContext context) {
-        final var path = parsePath(expression);
+        final var path = pathCache.computeIfAbsent(expression, this::parsePath);
 
         if (path.rootName().isBlank()) {
             return null;
@@ -45,45 +54,26 @@ public final class PropertyReader {
         }
 
         final var sourceType = source.getClass();
+        final var cacheKey = sourceType.getName() + ":" + propertyName;
 
-        final var recordAccessor = findZeroArgumentMethod(sourceType, propertyName);
-
-        if (recordAccessor != null) {
-            return invokeMethod(
-                    source,
-                    recordAccessor,
-                    propertyName);
+        MethodHandle handle = handleCache.get(cacheKey);
+        if (handle != null) {
+            try {
+                return handle.invoke(source);
+            } catch (Throwable e) {
+                throw new TemplateRenderException("Failed to read property '" + propertyName + "'.", e);
+            }
         }
 
-        final var getter = findZeroArgumentMethod(
-                sourceType,
-                "get" + capitalize(propertyName));
+        handle = findAndCreateHandle(sourceType, propertyName);
 
-        if (getter != null) {
-            return invokeMethod(
-                    source,
-                    getter,
-                    propertyName);
-        }
-
-        final var booleanGetter = findZeroArgumentMethod(
-                sourceType,
-                "is" + capitalize(propertyName));
-
-        if (booleanGetter != null) {
-            return invokeMethod(
-                    source,
-                    booleanGetter,
-                    propertyName);
-        }
-
-        final var field = findPublicField(sourceType, propertyName);
-
-        if (field != null) {
-            return readField(
-                    source,
-                    field,
-                    propertyName);
+        if (handle != null) {
+            handleCache.put(cacheKey, handle);
+            try {
+                return handle.invoke(source);
+            } catch (Throwable e) {
+                throw new TemplateRenderException("Failed to read property '" + propertyName + "'.", e);
+            }
         }
 
         if (optional) {
@@ -92,6 +82,37 @@ public final class PropertyReader {
 
         throw new TemplateRenderException(
                 "Unknown property '" + propertyName + "' on " + sourceType.getName() + ".");
+    }
+
+    private MethodHandle findAndCreateHandle(Class<?> sourceType, String propertyName) {
+        try {
+            final var recordAccessor = findZeroArgumentMethod(sourceType, propertyName);
+            if (recordAccessor != null) {
+                recordAccessor.setAccessible(true);
+                return LOOKUP.unreflect(recordAccessor);
+            }
+
+            final var getter = findZeroArgumentMethod(sourceType, "get" + capitalize(propertyName));
+            if (getter != null) {
+                getter.setAccessible(true);
+                return LOOKUP.unreflect(getter);
+            }
+
+            final var booleanGetter = findZeroArgumentMethod(sourceType, "is" + capitalize(propertyName));
+            if (booleanGetter != null) {
+                booleanGetter.setAccessible(true);
+                return LOOKUP.unreflect(booleanGetter);
+            }
+
+            final var field = findPublicField(sourceType, propertyName);
+            if (field != null) {
+                field.setAccessible(true);
+                return LOOKUP.unreflectGetter(field);
+            }
+        } catch (IllegalAccessException e) {
+            // Fallback
+        }
+        return null;
     }
 
     private Object readMapEntryProperty(
@@ -211,28 +232,6 @@ public final class PropertyReader {
             return sourceType.getField(fieldName);
         } catch (NoSuchFieldException exception) {
             return null;
-        }
-    }
-
-    private Object invokeMethod(Object source, Method method, String propertyName) {
-        try {
-            method.setAccessible(true);
-            return method.invoke(source);
-        } catch (ReflectiveOperationException exception) {
-            throw new TemplateRenderException(
-                    "Failed to read property '" + propertyName + "'.",
-                    exception);
-        }
-    }
-
-    private Object readField(Object source, Field field, String propertyName) {
-        try {
-            field.setAccessible(true);
-            return field.get(source);
-        } catch (IllegalAccessException exception) {
-            throw new TemplateRenderException(
-                    "Failed to read field '" + propertyName + "'.",
-                    exception);
         }
     }
 
