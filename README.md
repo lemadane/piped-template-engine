@@ -158,15 +158,13 @@ Efficient multi-branch switch statements. Supports explicit `fallthrough`.
 
 ---
 
-### 7. Loops (`|each|`) & Loop Metadata
-Loop over Collections, Sets, Maps, and Arrays. Provides a fallback `|else|` if empty, and local metadata variables.
+### 7. Loops (`|each|`)
+Loop over Collections, Sets, Maps, and Arrays. Provides a fallback `|else|` if the collection is empty or null.
 
 ```html
 <ul>
 |each item in taskList|
-    <li class="|each.first ? 'first-item' : ''|">
-        |each.count|: |item.title|
-    </li>
+    <li>|item.title|</li>
 |else|
     <li>No tasks found.</li>
 |/each|
@@ -175,21 +173,43 @@ Loop over Collections, Sets, Maps, and Arrays. Provides a fallback `|else|` if e
 
 ---
 
-### 8. Loop Separators
-Render delimiters (like commas, dots, or HTML spans) between list elements automatically.
+### 8. Loop Metadata
+Access iteration state properties (`index`, `count`, `first`, `last`, `total`) using the local `each` scope inside any loop.
 
 ```html
-<!-- Prints: Java, Spring Boot, PTE -->
-<p>Tech Stack: 
-|each tech in techStack|
-    <strong>|tech|</strong>|separator|, |/separator|
+|each item in items|
+    <div class="|each.first ? 'header-item' : ''|">
+        Item |each.count| of |each.total|: |item.name|
+    </div>
 |/each|
-</p>
 ```
 
 ---
 
-### 9. Layouts & Yield Sections
+### 9. Loop Separators
+Render delimiters (like commas, breadcrumb symbols, or HTML dividers) between loop iterations automatically, skipping the final item.
+
+```html
+<!-- Output: HTML / CSS / JS -->
+|each skill in skills||skill||separator| / |/separator||/each|
+```
+
+---
+
+### 10. SvelteKit-Style File-Based Routing
+Zero-code web endpoints generated directly from your directory tree hierarchy, automatically injecting path and query variables.
+
+**Template Path (`src/main/resources/pte-routes/posts/[id]/+page.pte`)**:
+```html
+<div>
+    <h1>Post Details</h1>
+    <p>Viewing Post ID: |id|</p>
+</div>
+```
+
+---
+
+### 11. Layouts & Yield Sections
 Wrap pages inside master templates to reuse headers, sidebars, and scripts.
 
 **Layout File (`layouts/main.pte`)**:
@@ -199,7 +219,6 @@ Wrap pages inside master templates to reuse headers, sidebars, and scripts.
     <title>|yield title|</title>
 </head>
 <body>
-    <nav>Navigation Banner</nav>
     <main>|yield content|</main>
 </body>
 </html>
@@ -216,7 +235,7 @@ Wrap pages inside master templates to reuse headers, sidebars, and scripts.
 
 ---
 
-### 10. Components & Named Slots
+### 12. Components & Named Slots
 Define highly reusable interface widgets and pass them rich nested markup slots.
 
 **Component File (`components/card.pte`)**:
@@ -241,7 +260,7 @@ Define highly reusable interface widgets and pass them rich nested markup slots.
 
 ---
 
-### 11. Includes
+### 13. Includes
 Include simple partial template files directly. Supports passing sub-models using the `with` statement.
 
 ```html
@@ -251,7 +270,7 @@ Include simple partial template files directly. Supports passing sub-models usin
 
 ---
 
-### 12. Template-Defined Macros
+### 14. Template-Defined Macros
 Define reusable markup function helpers directly inside your templates or utility files.
 
 ```html
@@ -266,7 +285,7 @@ Define reusable markup function helpers directly inside your templates or utilit
 
 ---
 
-### 13. Inline Template Fragments
+### 15. Inline Template Fragments
 Target and render specific subsections of a template. Excellent for returning lightweight HTML payloads for HTMX updates.
 
 **Template File (`pages/tasks.pte`)**:
@@ -289,7 +308,7 @@ String html = templateEngine.renderFragment("pages/tasks", "list-zone", model);
 
 ---
 
-### 14. Strongly Typed Models
+### 16. Strongly Typed Models
 Explicitly declare your page model type at the top of templates.
 
 ```html
@@ -301,13 +320,34 @@ Explicitly declare your page model type at the top of templates.
 
 ---
 
-### 15. built-in Pipe Filters
-Clean filters to modify, capitalize, format, or slugify output values.
+### 17. Built-in Pipe Filters
+Apply formatter transformations directly to variable output expressions.
 
 ```html
-|title, upper|             <!-- 'hello' -> 'HELLO' -->
-|name, lower, capitalize|  <!-- 'JOHN' -> 'John' -->
-|title, slug|              <!-- 'Hello World & welcome!' -> 'hello-world-welcome' -->
-|price, currency 'USD'|    <!-- 9.99 -> '$9.99' -->
-|createdDate, date 'yyyy'| <!-- 2026-07-22 -> '2026' -->
+<p>User: |name, lower, capitalize|</p> <!-- 'ALICE' -> 'Alice' -->
+<p>Slug: |title, slug|</p>               <!-- 'First Post!' -> 'first-post' -->
+<p>Cost: |price, currency 'EUR'|</p>    <!-- 15.5 -> '15.50 €' -->
+```
+
+---
+
+### 18. Conditional Attribute Whitespace Cleanup
+PTE parses surrounding tags and automatically cleans up extra trailing/double whitespaces if a conditional attribute evaluates to false.
+
+```html
+<!-- If completed is false, output is cleaned up to: <input class="form-input"> -->
+<!-- No trailing or double spacing is left in the HTML output! -->
+<input class="form-input" |attr checked if completed|>
+```
+
+---
+
+### 19. Circular Include Detection
+PTE tracks the active include stack at render-time and throws a compile-time exception if a template attempts to include itself recursively.
+
+```html
+<!-- If templates/index.pte includes partials/navbar.pte -->
+<!-- And partials/navbar.pte includes templates/index.pte -->
+<!-- PTE throws: circular include detected: index -> navbar -> index -->
+|include partials/navbar|
 ```
