@@ -1,1 +1,1 @@
-com.piped.template.engine.spring.PipedTemplateAutoConfiguration
+io.succinct.piped.template.engine.spring.PipedTemplateAutoConfiguration

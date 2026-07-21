@@ -3,7 +3,7 @@ plugins {
 }
 
 application {
-    mainClass = 'com.piped.template.engine.Main'
+    mainClass = 'io.succinct.piped.template.engine.Main'
 }
 
 dependencies {
