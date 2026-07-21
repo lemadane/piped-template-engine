@@ -101,7 +101,7 @@ The `[id]` parameter is automatically available in your template:
 ```html
 <ul>
 |each item in items|
-    <li>|it.title|</li>
+    <li>|item.title|</li>
 |else|
     <p>No items found.</p>
 |/each|
