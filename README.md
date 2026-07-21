@@ -73,29 +73,50 @@ Here is a complete list of all template features supported in PTE since day one:
 
 ---
 
-### 1. Output & Escaping Modes
-PTE provides 5 context-aware escaping modes to prevent injection attacks.
+### 1. HTML Escaping (Default Output)
+Automatically filters output values to prevent Cross-Site Scripting (XSS) injections.
 
 ```html
-<!-- HTML Escaped (Default) -->
-<p>|user.bio|</p> <!-- '<b>Hi</b>' -> '&lt;b&gt;Hi&lt;/b&gt;' -->
-
-<!-- Raw / Trusted HTML -->
-<div>|html user.signature|</div> <!-- Renders raw HTML markup safely -->
-
-<!-- HTML Attribute Escaped -->
-<input value="|attr user.name|"> <!-- Prevents breaking out of input attributes -->
-
-<!-- JSON Escaped -->
-<script>var config = |json user.settings|;</script>
-
-<!-- URL Escaped -->
-<a href="/search?q=|url search_query|">Search</a>
+<!-- Renders: &lt;b&gt;Hello&lt;/b&gt; -->
+<p>|user.bio|</p>
 ```
 
 ---
 
-### 2. Optional Chaining & Null Safety
+### 2. Raw / Trusted HTML Output (`|html expr|`)
+Bypasses default HTML escaping to output raw markup safely.
+
+```html
+<!-- Renders: <b>Welcome back!</b> -->
+<div>|html user.signature|</div>
+```
+
+---
+
+### 3. HTML Attribute Escaping (`|attr expr|`)
+Escapes characters specifically for injection safety inside HTML attributes.
+
+```html
+<!-- Prevents breaking out of double quotes -->
+<input value="|attr user.name|">
+```
+
+---
+
+### 4. JSON & URL Encoding (`|json expr|` / `|url expr|`)
+Formats output for JavaScript blocks and query parameter safety.
+
+```html
+<!-- JSON Escaping -->
+<script>var settings = |json user.settings|;</script>
+
+<!-- URL Escaping -->
+<a href="/search?q=|url query|">Search</a>
+```
+
+---
+
+### 5. Optional Chaining & Null Safety
 Safely navigate deeply nested object properties without throwing `NullPointerException`.
 
 ```html
@@ -105,7 +126,7 @@ Safely navigate deeply nested object properties without throwing `NullPointerExc
 
 ---
 
-### 3. Ternary Conditional Operator
+### 6. Ternary Conditional Operator
 Clean inline branching syntax directly inside expressions and attribute values.
 
 ```html
@@ -117,7 +138,7 @@ Clean inline branching syntax directly inside expressions and attribute values.
 
 ---
 
-### 4. Conditional Attribute Shorthand
+### 7. Conditional Attribute Shorthand
 Cleanly attach boolean attributes like `checked`, `disabled`, or `selected` without printing empty properties.
 
 ```html
@@ -127,7 +148,7 @@ Cleanly attach boolean attributes like `checked`, `disabled`, or `selected` with
 
 ---
 
-### 5. If / Else-If / Else Conditionals
+### 8. If / Else-If / Else Conditionals
 Standard blocks for rendering structural template changes.
 
 ```html
@@ -142,7 +163,7 @@ Standard blocks for rendering structural template changes.
 
 ---
 
-### 6. Switch Blocks
+### 9. Switch Blocks
 Efficient multi-branch switch statements. Supports explicit `fallthrough`.
 
 ```html
@@ -158,7 +179,7 @@ Efficient multi-branch switch statements. Supports explicit `fallthrough`.
 
 ---
 
-### 7. Loops (`|each|`)
+### 10. Loops (`|each|`)
 Loop over Collections, Sets, Maps, and Arrays. Provides a fallback `|else|` if the collection is empty or null.
 
 ```html
@@ -173,7 +194,7 @@ Loop over Collections, Sets, Maps, and Arrays. Provides a fallback `|else|` if t
 
 ---
 
-### 8. Loop Metadata
+### 11. Loop Metadata
 Access iteration state properties (`index`, `count`, `first`, `last`, `total`) using the local `each` scope inside any loop.
 
 ```html
@@ -186,7 +207,7 @@ Access iteration state properties (`index`, `count`, `first`, `last`, `total`) u
 
 ---
 
-### 9. Loop Separators
+### 12. Loop Separators
 Render delimiters (like commas, breadcrumb symbols, or HTML dividers) between loop iterations automatically, skipping the final item.
 
 ```html
@@ -196,7 +217,7 @@ Render delimiters (like commas, breadcrumb symbols, or HTML dividers) between lo
 
 ---
 
-### 10. SvelteKit-Style File-Based Routing
+### 13. SvelteKit-Style File-Based Routing
 Zero-code web endpoints generated directly from your directory tree hierarchy, automatically injecting path and query variables.
 
 **Template Path (`src/main/resources/pte-routes/posts/[id]/+page.pte`)**:
@@ -209,7 +230,7 @@ Zero-code web endpoints generated directly from your directory tree hierarchy, a
 
 ---
 
-### 11. Layouts & Yield Sections
+### 14. Layouts & Yield Sections
 Wrap pages inside master templates to reuse headers, sidebars, and scripts.
 
 **Layout File (`layouts/main.pte`)**:
@@ -235,7 +256,7 @@ Wrap pages inside master templates to reuse headers, sidebars, and scripts.
 
 ---
 
-### 12. Components & Named Slots
+### 15. Components & Named Slots
 Define highly reusable interface widgets and pass them rich nested markup slots.
 
 **Component File (`components/card.pte`)**:
@@ -260,7 +281,7 @@ Define highly reusable interface widgets and pass them rich nested markup slots.
 
 ---
 
-### 13. Includes
+### 16. Includes
 Include simple partial template files directly. Supports passing sub-models using the `with` statement.
 
 ```html
@@ -270,7 +291,7 @@ Include simple partial template files directly. Supports passing sub-models usin
 
 ---
 
-### 14. Template-Defined Macros
+### 17. Template-Defined Macros
 Define reusable markup function helpers directly inside your templates or utility files.
 
 ```html
@@ -285,7 +306,7 @@ Define reusable markup function helpers directly inside your templates or utilit
 
 ---
 
-### 15. Inline Template Fragments
+### 18. Inline Template Fragments
 Target and render specific subsections of a template. Excellent for returning lightweight HTML payloads for HTMX updates.
 
 **Template File (`pages/tasks.pte`)**:
@@ -308,7 +329,7 @@ String html = templateEngine.renderFragment("pages/tasks", "list-zone", model);
 
 ---
 
-### 16. Strongly Typed Models
+### 19. Strongly Typed Models
 Explicitly declare your page model type at the top of templates.
 
 ```html
@@ -320,7 +341,7 @@ Explicitly declare your page model type at the top of templates.
 
 ---
 
-### 17. Built-in Pipe Filters
+### 20. Built-in Pipe Filters
 Apply formatter transformations directly to variable output expressions.
 
 ```html
@@ -331,7 +352,7 @@ Apply formatter transformations directly to variable output expressions.
 
 ---
 
-### 18. Conditional Attribute Whitespace Cleanup
+### 21. Conditional Attribute Whitespace Cleanup
 PTE parses surrounding tags and automatically cleans up extra trailing/double whitespaces if a conditional attribute evaluates to false.
 
 ```html
@@ -342,7 +363,7 @@ PTE parses surrounding tags and automatically cleans up extra trailing/double wh
 
 ---
 
-### 19. Circular Include Detection
+### 22. Circular Include Detection
 PTE tracks the active include stack at render-time and throws a compile-time exception if a template attempts to include itself recursively.
 
 ```html
@@ -354,7 +375,7 @@ PTE tracks the active include stack at render-time and throws a compile-time exc
 
 ---
 
-### 20. HTML Minification & Prettifying
+### 23. HTML Minification & Prettifying
 Compress raw templates using the block-level `|minify|` tag, or configure the engine globally to minify or prettify (beautify) all rendered page sources automatically.
 
 ```html
