@@ -55,6 +55,22 @@
                 </p>
             |/minify|
         </div>
+
+        <hr style="border-color: #202325; margin: 2rem 0;">
+
+        <!-- 5. Attempt & Recover Demo -->
+        <h2 style="color: #00c076; font-size: 1.5rem;">5. Recoverable Rendering (Attempt & Recover)</h2>
+        <div style="padding: 1rem; background-color: #202325; border-radius: 8px; margin-top: 1rem;">
+            |attempt|
+                <p>This text will be discarded because an arithmetic error occurs below...</p>
+                <!-- Triggers division by zero -->
+                <div>|1 / 0|</div>
+            |recover as err_msg|
+                <p style="color: #ff3860; font-weight: bold; margin: 0;">
+                    Failed to render block cleanly! Recovered from error: <code style="background: #17191b; padding: 2px 4px; border-radius: 3px;">|err_msg|</code>
+                </p>
+            |/attempt|
+        </div>
     </div>
 </body>
 </html>

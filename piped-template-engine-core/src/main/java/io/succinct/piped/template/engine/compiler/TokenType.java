@@ -37,5 +37,8 @@ public enum TokenType {
     END_FRAGMENT,
     MINIFY,
     END_MINIFY,
-    PAGE
+    PAGE,
+    ATTEMPT,
+    RECOVER,
+    END_ATTEMPT
 }

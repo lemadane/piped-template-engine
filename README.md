@@ -438,3 +438,20 @@ Access implicit HTTP request metadata properties (`requestUri`, `method`, `heade
     <a href="/settings" class="|page.requestUri == '/settings' ? 'active' : ''|">Settings</a>
 </nav>
 ```
+
+---
+
+### 27. Recoverable Rendering (Attempt & Recover)
+Wrap error-prone layout widgets, database-backed components, or custom scripts inside attempt blocks. If rendering fails, PTE rolls back/discards all partial HTML output generated inside the block, captures the error description into a named variable, and renders the recover fallback block instead.
+
+```html
+|attempt|
+    <!-- If sales-chart fails or throws an exception, all inner markup is rolled back -->
+    |component "components/sales-chart" with { report: report }|
+    |/component|
+|recover as error_detail|
+    <div class="notification is-warning">
+        The sales chart is temporarily unavailable. Details: |error_detail|
+    </div>
+|/attempt|
+```

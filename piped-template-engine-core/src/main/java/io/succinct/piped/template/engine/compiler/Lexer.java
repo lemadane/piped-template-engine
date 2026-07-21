@@ -123,6 +123,12 @@ public final class Lexer {
             return TokenType.END_MINIFY;
         } else if (content.startsWith("page ")) {
             return TokenType.PAGE;
+        } else if ("attempt".equals(content)) {
+            return TokenType.ATTEMPT;
+        } else if (content.startsWith("recover")) {
+            return TokenType.RECOVER;
+        } else if ("/attempt".equals(content)) {
+            return TokenType.END_ATTEMPT;
         }
         return TokenType.EXPRESSION;
     }

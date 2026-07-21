@@ -81,6 +81,34 @@ public final class JavaCodeGenerator {
             sb.append(indent).append("    writer = prevWriter;\n");
             sb.append(indent).append("    writer.write(io.succinct.piped.template.engine.utils.HtmlFormatter.minifyHtml(sw.toString()));\n");
             sb.append(indent).append("}\n");
+        } else if (node instanceof io.succinct.piped.template.engine.ast.AttemptNode attemptNode) {
+            sb.append(indent).append("{\n");
+            sb.append(indent).append("    java.io.StringWriter sw = new java.io.StringWriter();\n");
+            sb.append(indent).append("    java.io.Writer prevWriter = writer;\n");
+            sb.append(indent).append("    writer = sw;\n");
+            sb.append(indent).append("    try {\n");
+            generateNodeSource(attemptNode.getBody(), sb, indent + "        ");
+            sb.append(indent).append("        prevWriter.write(sw.toString());\n");
+            sb.append(indent).append("    } catch (Exception e) {\n");
+            if (attemptNode.getRecoverBlock() != null) {
+                sb.append(indent).append("        io.succinct.piped.template.engine.expression.TemplateContext nextCtx = context;\n");
+                if (attemptNode.getErrorVarName() != null && !attemptNode.getErrorVarName().isEmpty()) {
+                    sb.append(indent).append("        String errorMsg = e.getMessage() != null ? e.getMessage() : e.toString();\n");
+                    sb.append(indent).append("        nextCtx = context.with(").append(escapeStringLiteral(attemptNode.getErrorVarName())).append(", errorMsg);\n");
+                }
+                sb.append(indent).append("        java.io.Writer recoverWriter = prevWriter;\n");
+                sb.append(indent).append("        {\n");
+                sb.append(indent).append("            io.succinct.piped.template.engine.expression.TemplateContext prevCtx = context;\n");
+                sb.append(indent).append("            context = nextCtx;\n");
+                sb.append(indent).append("            writer = recoverWriter;\n");
+                generateNodeSource(attemptNode.getRecoverBlock(), sb, indent + "            ");
+                sb.append(indent).append("            context = prevCtx;\n");
+                sb.append(indent).append("        }\n");
+            }
+            sb.append(indent).append("    } finally {\n");
+            sb.append(indent).append("        writer = prevWriter;\n");
+            sb.append(indent).append("    }\n");
+            sb.append(indent).append("}\n");
         }
     }
 

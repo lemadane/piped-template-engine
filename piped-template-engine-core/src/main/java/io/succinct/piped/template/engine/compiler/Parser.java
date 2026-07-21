@@ -70,6 +70,7 @@ public final class Parser {
                 case FRAGMENT -> nodes.add(parseFragment(token, cursor));
                 case MINIFY -> nodes.add(parseMinify(token, cursor));
                 case PAGE -> parsePageMetadata(token);
+                case ATTEMPT -> nodes.add(parseAttempt(token, cursor));
                 default -> {
                     var outputExpr = outputExpressionParser.parse(token.value());
                     nodes.add(new ExpressionNode(outputExpr, evaluator));
@@ -268,6 +269,28 @@ public final class Parser {
             // Ignore
         }
         return str;
+    }
+
+    private io.succinct.piped.template.engine.ast.AttemptNode parseAttempt(Token attemptToken, Cursor cursor) {
+        ASTNode body = parseBlock(cursor, TokenType.RECOVER);
+
+        if (!cursor.hasNext() || cursor.peek().type() != TokenType.RECOVER) {
+            throw new TemplateSyntaxException("Missing matching |recover| block inside |attempt|.");
+        }
+
+        Token recoverToken = cursor.next();
+        String errorVarName = null;
+        String val = recoverToken.value().substring("recover".length()).trim();
+        if (val.startsWith("as ")) {
+            errorVarName = val.substring("as ".length()).trim();
+        }
+
+        ASTNode recoverBlock = parseBlock(cursor, TokenType.END_ATTEMPT);
+        if (cursor.hasNext() && cursor.peek().type() == TokenType.END_ATTEMPT) {
+            cursor.next();
+        }
+
+        return new io.succinct.piped.template.engine.ast.AttemptNode(body, recoverBlock, errorVarName);
     }
 
     private static class Cursor {
