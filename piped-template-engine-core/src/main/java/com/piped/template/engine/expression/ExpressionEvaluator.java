@@ -694,6 +694,7 @@ public final class ExpressionEvaluator {
                   case "lower" -> stringValue(value).toLowerCase(Locale.ROOT);
                   case "trim" -> stringValue(value).trim();
                   case "capitalize" -> capitalizeText(stringValue(value));
+                  case "slug" -> slugify(stringValue(value));
                   case "length" -> lengthOf(value);
                   case "default" -> defaultValue(value, filterCall.argumentExpression(), context);
                   case "currency" -> currencyValue(value, filterCall.argumentExpression(), context);
@@ -743,6 +744,19 @@ public final class ExpressionEvaluator {
             }
 
             return value.substring(0, 1).toUpperCase(Locale.ROOT) + value.substring(1);
+      }
+
+      private String slugify(String value) {
+            if (value == null || value.isBlank()) {
+                  return "";
+            }
+            String normalized = java.text.Normalizer.normalize(value, java.text.Normalizer.Form.NFD);
+            return normalized.replaceAll("\\p{M}", "")
+                        .toLowerCase(Locale.ROOT)
+                        .replaceAll("[^a-z0-9\\s-]", "")
+                        .trim()
+                        .replaceAll("[\\s_]+", "-")
+                        .replaceAll("-+", "-");
       }
 
       private int lengthOf(Object value) {

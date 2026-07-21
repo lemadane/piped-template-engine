@@ -63,6 +63,16 @@ class FilterTest {
       }
 
       @Test
+      @DisplayName("Supports slug filter")
+      void supportsSlugFilter() {
+         final var html = engine.renderString(
+               "|title, slug|",
+               Map.of("title", "  Hello World & Welcome!  "));
+
+         assertEquals("hello-world-welcome", html);
+      }
+
+      @Test
       @DisplayName("Supports chained text filters")
       void supportsChainedTextFilters() {
          final var html = engine.renderString(

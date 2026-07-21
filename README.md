@@ -19,6 +19,7 @@ PTE features an **In-Memory Java Bytecode Compiler (CodeGen Engine)**, matching 
 
 - **🚀 JTE-Level Performance**: Transpiles template AST nodes into Java source code and compiles them **in-memory** to `.class` bytecode (`javax.tools.JavaCompiler`). Zero AST interpretation loops during render execution!
 - **📁 SvelteKit-Style File-Based Routing**: Zero-code routing via directory conventions (`pte-routes/+page.pte`, `[id]`, `@PageLoader`).
+- **🔗 Built-in Slug Generator**: Built-in `|title, slug|` pipe filter for SEO-friendly URLs and valid HTMX target DOM IDs.
 - **🍃 Spring Boot Starter**: Auto-configures `PipedTemplateViewResolver` and route handlers for Spring MVC.
 - **⚡ HTMX-Native**: Out-of-band swaps, dynamic partials, and clean slot/layout composition.
 - **🛡️ Safe by Default**: Automatic HTML escaping, attribute safety, JSON encoding, and URL encoding.
@@ -117,6 +118,23 @@ public class HomeController {
 |attr user.role|                <!-- Attribute Escaped -->
 |json user.settings|            <!-- JSON Encoded -->
 |url user.website|              <!-- URL Encoded -->
+```
+
+### Text Filters & Slug Generation 🔗
+
+PTE includes built-in text transformation filters for SEO-friendly URLs and HTMX DOM IDs:
+
+```html
+<!-- SEO-Friendly Clean URLs for SvelteKit Routes (/blog/[slug]) -->
+<a href="/blog/|post.title, slug|">|post.title|</a>
+<!-- 'Hello World & Welcome!' -> 'hello-world-welcome' -->
+
+<!-- Safe HTMX Target DOM IDs -->
+<li id="task-|task.title, slug|">|task.title|</li>
+<!-- 'Buy Groceries & Milk' -> 'task-buy-groceries-milk' -->
+
+<!-- Chained Text Filters -->
+<p>|user.name, trim, lower, capitalize|</p>
 ```
 
 ### Operators & Null Safety
