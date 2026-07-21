@@ -113,6 +113,10 @@ public final class Lexer {
             return TokenType.SEPARATOR;
         } else if ("/separator".equals(content)) {
             return TokenType.END_SEPARATOR;
+        } else if (content.startsWith("fragment ")) {
+            return TokenType.FRAGMENT;
+        } else if ("/fragment".equals(content)) {
+            return TokenType.END_FRAGMENT;
         }
         return TokenType.EXPRESSION;
     }

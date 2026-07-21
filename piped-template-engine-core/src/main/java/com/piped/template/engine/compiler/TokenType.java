@@ -32,5 +32,7 @@ public enum TokenType {
     END_MACRO,
     CALL,
     SEPARATOR,
-    END_SEPARATOR
+    END_SEPARATOR,
+    FRAGMENT,
+    END_FRAGMENT
 }

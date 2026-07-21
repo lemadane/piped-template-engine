@@ -21,6 +21,7 @@
 - **🔁 Loop Separators**: Built-in `|separator|` directive for clean lists and breadcrumbs without repetitive `if (!last)` checks.
 - **🍃 Spring Boot Ready**: Seamless integration with Spring MVC.
 - **⚡ HTMX Friendly**: Perfect for modern, dynamic single-page interactions without heavy JavaScript.
+- **🧩 Inline Fragments**: Render targeted template sections independently (e.g. `|fragment name|`), making HTMX updates incredibly easy.
 - **🛡️ Safe**: Automatically prevents XSS security vulnerabilities by default.
 
 ---
@@ -141,7 +142,31 @@ Define reusable HTML helper macros and invoke them anywhere:
 |/each|
 ```
 
-### 5. Layouts (Reusing Headers & Footers)
+### 5. Inline Template Fragments
+Mark specific sections of a template to render independently for AJAX/HTMX requests:
+
+```html
+<div>
+    <h1>My Page Header</h1>
+    
+    <!-- Define a Fragment -->
+    |fragment task-list|
+        <ul id="tasks">
+            |each task in tasks|
+                <li>|task.title|</li>
+            |/each|
+        </ul>
+    |/fragment|
+</div>
+```
+
+Invoke via Java API:
+```java
+// Renders only the <ul> block (excluding "My Page Header" and div wrappers)
+String html = templateEngine.renderFragment("pages/index", "task-list", model);
+```
+
+### 6. Layouts (Reusing Headers & Footers)
 
 `layouts/main.pte` (The Master Template):
 ```html

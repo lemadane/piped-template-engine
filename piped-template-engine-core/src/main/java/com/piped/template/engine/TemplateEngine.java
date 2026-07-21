@@ -180,6 +180,85 @@ public final class TemplateEngine {
         return renderNamedTemplate(templateName, createContextFromValue(value));
     }
 
+    public String renderFragment(String templateOrTemplateName, String fragmentName, Map<String, Object> values) {
+        String templateSource = loadTemplateSource(templateOrTemplateName);
+        var compiled = compile(templateSource);
+        var rootNode = compiled.getRootNode();
+        var context = new TemplateContext(values);
+
+        com.piped.template.engine.ast.FragmentNode fragmentNode = findFragmentNode(rootNode, fragmentName);
+        if (fragmentNode == null) {
+            throw new IllegalArgumentException("Fragment '" + fragmentName + "' not found in template.");
+        }
+
+        java.io.StringWriter sw = new java.io.StringWriter();
+        try {
+            fragmentNode.render(context, sw);
+        } catch (IOException e) {
+            throw new TemplateRenderException("Failed to render fragment: " + fragmentName, e);
+        }
+        return sw.toString();
+    }
+
+    private com.piped.template.engine.ast.FragmentNode findFragmentNode(com.piped.template.engine.ast.ASTNode node, String name) {
+        if (node == null) {
+            return null;
+        }
+        if (node instanceof com.piped.template.engine.ast.FragmentNode frag) {
+            if (name.equals(frag.getName())) {
+                return frag;
+            }
+            var found = findFragmentNode(frag.getBody(), name);
+            if (found != null) return found;
+        }
+        if (node instanceof com.piped.template.engine.ast.BlockNode block) {
+            for (com.piped.template.engine.ast.ASTNode child : block.getChildren()) {
+                var found = findFragmentNode(child, name);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        if (node instanceof com.piped.template.engine.ast.IfNode ifNode) {
+            var found = findFragmentNode(ifNode.getThenBlock(), name);
+            if (found != null) return found;
+            for (com.piped.template.engine.ast.IfNode.ElseIfBranch branch : ifNode.getElseIfBranches()) {
+                found = findFragmentNode(branch.block(), name);
+                if (found != null) return found;
+            }
+            if (ifNode.getElseBlock() != null) {
+                found = findFragmentNode(ifNode.getElseBlock(), name);
+                if (found != null) return found;
+            }
+        }
+        if (node instanceof com.piped.template.engine.ast.EachNode eachNode) {
+            var found = findFragmentNode(eachNode.getBodyBlock(), name);
+            if (found != null) return found;
+            if (eachNode.getSeparatorNode() != null) {
+                found = findFragmentNode(eachNode.getSeparatorNode(), name);
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
+    private String loadTemplateSource(String templateOrTemplateName) {
+        if (templateRoot != null && isTemplateReference(templateOrTemplateName)) {
+            String normalizedTemplateName = normalizeTemplateName(templateOrTemplateName);
+            String inMemoryTemplate = includedTemplates.get(normalizedTemplateName);
+            if (inMemoryTemplate != null) {
+                return inMemoryTemplate;
+            }
+            try {
+                var templatePath = resolveTemplatePath(normalizedTemplateName);
+                return Files.readString(templatePath, java.nio.charset.StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                throw new TemplateRenderException("Failed to load template: " + normalizedTemplateName, e);
+            }
+        }
+        return templateOrTemplateName;
+    }
+
     private String renderTemplateSource(String template, TemplateContext context) {
         final var layoutDirective = findLayoutDirective(template);
 

@@ -47,6 +47,10 @@ public final class EachNode implements ASTNode {
         return separatorNode;
     }
 
+    public ASTNode getBodyBlock() {
+        return bodyBlock;
+    }
+
     @Override
     public void render(TemplateContext context, Writer writer) throws IOException {
         Object rawValue = evaluator.evaluate(collectionExpression, context);

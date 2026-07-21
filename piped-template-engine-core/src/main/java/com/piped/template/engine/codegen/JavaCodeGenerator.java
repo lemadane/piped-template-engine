@@ -70,6 +70,8 @@ public final class JavaCodeGenerator {
             sb.append("), new com.piped.template.engine.expression.ExpressionEvaluator()).render(context, writer);\n");
         } else if (node instanceof com.piped.template.engine.ast.SeparatorNode sepNode) {
             generateNodeSource(sepNode.getBody(), sb, indent);
+        } else if (node instanceof com.piped.template.engine.ast.FragmentNode fragNode) {
+            generateNodeSource(fragNode.getBody(), sb, indent);
         }
     }
 

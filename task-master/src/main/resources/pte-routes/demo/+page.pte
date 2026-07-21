@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PTE Feature Demo</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body style="padding: 2rem; background-color: #17191b; color: #fff;">
+    <div style="max-width: 600px; margin: 0 auto; font-family: sans-serif;">
+        <h1 style="color: #00c076;">PTE Modern Features Demo</h1>
+        <p>This page is served via SvelteKit-style File-Based Routing!</p>
+
+        <hr style="border-color: #202325; margin: 2rem 0;">
+
+        <!-- 1. Macros Demo -->
+        <h2 style="color: #00c076; font-size: 1.5rem;">1. Twig-style Macros</h2>
+        |macro custom_button(label, color)|
+            <button style="background-color: |color ?? '#00c076'|; color: #fff; padding: 0.5rem 1rem; border: none; border-radius: 4px; margin-right: 0.5rem; cursor: pointer;">
+                |label|
+            </button>
+        |/macro|
+
+        <div style="margin-top: 1rem;">
+            |call custom_button('Primary Button', '#00c076')|
+            |call custom_button('Secondary Button', '#202325')|
+        </div>
+
+        <hr style="border-color: #202325; margin: 2rem 0;">
+
+        <!-- 2. Separators Demo -->
+        <h2 style="color: #00c076; font-size: 1.5rem;">2. FreeMarker-style Loop Separators</h2>
+        <p style="margin-top: 1rem;">Tech Stack: 
+            |each tech in ['Java', 'Spring Boot', 'Piped Template Engine', 'HTMX']|
+                <strong style="color: #00c076;">|tech|</strong>|separator|, |/separator|
+            |/each|
+        </p>
+
+        <hr style="border-color: #202325; margin: 2rem 0;">
+
+        <!-- 3. Fragments Demo -->
+        <h2 style="color: #00c076; font-size: 1.5rem;">3. Inline Fragments</h2>
+        <div style="padding: 1rem; background-color: #202325; border-radius: 8px; margin-top: 1rem;">
+            |fragment demo-fragment|
+                <p style="color: #00c076; font-weight: bold; margin: 0;">This block is inside an inline fragment! Only this block can be rendered independently.</p>
+            |/fragment|
+        </div>
+    </div>
+</body>
+</html>

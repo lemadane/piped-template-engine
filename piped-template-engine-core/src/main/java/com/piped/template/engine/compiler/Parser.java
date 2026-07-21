@@ -63,6 +63,7 @@ public final class Parser {
                     }
                     nodes.add(new com.piped.template.engine.ast.SeparatorNode(sepBody));
                 }
+                case FRAGMENT -> nodes.add(parseFragment(token, cursor));
                 default -> {
                     var outputExpr = outputExpressionParser.parse(token.value());
                     nodes.add(new ExpressionNode(outputExpr, evaluator));
@@ -197,6 +198,15 @@ public final class Parser {
         }
 
         return new com.piped.template.engine.ast.CallMacroNode(name, args, evaluator);
+    }
+
+    private com.piped.template.engine.ast.FragmentNode parseFragment(Token fragmentToken, Cursor cursor) {
+        String name = fragmentToken.value().substring("fragment ".length()).trim();
+        ASTNode body = parseBlock(cursor, TokenType.END_FRAGMENT);
+        if (cursor.hasNext() && cursor.peek().type() == TokenType.END_FRAGMENT) {
+            cursor.next();
+        }
+        return new com.piped.template.engine.ast.FragmentNode(name, body);
     }
 
     private static class Cursor {
