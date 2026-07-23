@@ -53,6 +53,19 @@ class ExpressionTest {
                "",
                html);
       }
+
+      private record UserRecord(String name, int age) {}
+
+      @Test
+      @DisplayName("Reads values from Java record classes")
+      void readsValuesFromJavaRecord() {
+         final var html = engine.renderString(
+               "|user.name| is |user.age| years old.",
+               Map.of("user", new UserRecord("Lemuel", 30)));
+         assertEquals(
+               "Lemuel is 30 years old.",
+               html);
+      }
    }
 
    @Nested

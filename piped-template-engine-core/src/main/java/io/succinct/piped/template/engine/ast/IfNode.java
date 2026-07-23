@@ -7,7 +7,7 @@ import java.io.Writer;
 import java.util.List;
 
 public final class IfNode implements ASTNode {
-    public record ElseIfBranch(String condition, ASTNode body) {}
+    public record ElseIfBranch(String condition, ASTNode block) {}
 
     private final String ifCondition;
     private final ASTNode thenBlock;
@@ -28,6 +28,18 @@ public final class IfNode implements ASTNode {
         this.evaluator = evaluator;
     }
 
+    public ASTNode getThenBlock() {
+        return thenBlock;
+    }
+
+    public List<ElseIfBranch> getElseIfBranches() {
+        return elseIfBranches;
+    }
+
+    public ASTNode getElseBlock() {
+        return elseBlock;
+    }
+
     @Override
     public void render(TemplateContext context, Writer writer) throws IOException {
         if (evaluator.evaluateBoolean(ifCondition, context)) {
@@ -38,7 +50,7 @@ public final class IfNode implements ASTNode {
         for (int i = 0; i < elseIfBranches.size(); i++) {
             ElseIfBranch branch = elseIfBranches.get(i);
             if (evaluator.evaluateBoolean(branch.condition(), context)) {
-                branch.body().render(context, writer);
+                branch.block().render(context, writer);
                 return;
             }
         }
